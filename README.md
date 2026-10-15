@@ -61,6 +61,13 @@ Grab a build from the
 | Linux Flatpak | `cartiglio-*-linux-x64.flatpak` | `flatpak install cartiglio-*.flatpak` (the GNOME runtime comes from Flathub) |
 | Linux portable | `cartiglio-*-linux-x64-portable.tar.gz` | untar, run `./cartiglio` |
 
+On Windows: **libadwaita inside, Windows outside**. The content is the same
+libadwaita interface as on Linux (drop zone, file list, toasts, dialogs),
+while the system title bar (dark when the theme is dark) handles moving,
+snapping and restoring from maximized, which GTK's own decorations get wrong
+on Windows. *Preferenze* switches to libadwaita's header bar, at the cost of
+snapping.
+
 ## Run from source
 
 Python ≥ 3.9, [PyMuPDF](https://github.com/pymupdf/PyMuPDF), optionally
@@ -79,7 +86,7 @@ python3 cartiglio.py
 ```
 
 On Windows, use a release build, or MSYS2 (UCRT64):
-`pacman -S mingw-w64-ucrt-x86_64-{gtk4,python-gobject,python-pymupdf,python-fonttools}`.
+`pacman -S mingw-w64-ucrt-x86_64-{gtk4,libadwaita,python-gobject,python-pymupdf,python-fonttools}`.
 
 ## CLI
 

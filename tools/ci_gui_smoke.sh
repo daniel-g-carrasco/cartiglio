@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # CI helper: drive the bundled GUI under Xvfb, once as a libadwaita app and
-# once on the plain GTK path (the one the Windows build uses): the folder
+# once on the plain GTK path (the fallback without libadwaita): the folder
 # handed on the command line must show up analysed. Nothing is written by
 # the GUI on its own (dates change only on "Change dates"), so the check is
 # the screenshot left in gui-<name>.png plus the process staying alive.

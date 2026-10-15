@@ -452,7 +452,7 @@ def main() -> int:
         s.set("check_updates", False)
         again = ct.Settings(ini)
         assert not again.get_bool("check_updates")
-        assert again.get_bool("native_decorations")  # untouched default survives
+        assert again.get_bool("system_title_bar")  # untouched default survives
 
     # --- command line -----------------------------------------------------------
     ns, unknown = ct.build_parser().parse_known_args(["--gui", "a.pdf", "--future-flag"])

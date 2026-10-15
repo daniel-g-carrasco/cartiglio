@@ -69,11 +69,9 @@ if WIN:
     else:
         print('WARNING: no CA bundle found: the update check may fail on TLS')
 
-# Introspection modules the gi hook must collect. The Linux GUI is a
-# libadwaita app; the Windows build stays on plain GTK (see cartiglio.py).
-GI_VERSIONS = {'Gtk': '4.0', 'Gdk': '4.0'}
-if not WIN:
-    GI_VERSIONS['Adw'] = '1'
+# Introspection modules the gi hook must collect: a libadwaita app on both
+# systems (on Windows inside a window with the system title bar).
+GI_VERSIONS = {'Gtk': '4.0', 'Gdk': '4.0', 'Adw': '1'}
 
 a = Analysis(
     ['cartiglio.py'],
