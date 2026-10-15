@@ -1,0 +1,6 @@
+# The PDF engine (MuPDF bindings) and, optional but recommended, fontTools:
+# with it only the digits the new dates need are embedded, a few kB instead
+# of the whole font. The GUI also needs PyGObject with GTK 4, which comes
+# from the system packages: see the README.
+pymupdf>=1.24
+fonttools>=4.40

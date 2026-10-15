@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Cartiglio
+Comment=Change the dates in the title block of PDF drawings and documents
+Comment[it]=Cambia le date nel cartiglio di tavole e documenti PDF
+Exec=cartiglio --gui %F
+Icon=io.github.daniel_g_carrasco.cartiglio
+Terminal=false
+Categories=Utility;Office;GTK;
+Keywords=PDF;title block;date;revision;drawing;engineering;
+Keywords[it]=PDF;cartiglio;data;revisione;tavola;elaborato;emissione;
+MimeType=application/pdf;
+StartupNotify=true

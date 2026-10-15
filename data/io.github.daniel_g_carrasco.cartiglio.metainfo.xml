@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- AppStream metadata: shown by GNOME Software / Flathub. -->
+<component type="desktop-application">
+  <id>io.github.daniel_g_carrasco.cartiglio</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+
+  <name>Cartiglio</name>
+  <summary>Change the dates in the title block of PDFs</summary>
+  <summary xml:lang="it">Cambia le date nel cartiglio dei PDF</summary>
+
+  <developer id="io.github.daniel_g_carrasco">
+    <name>Daniel Grasso</name>
+  </developer>
+
+  <description>
+    <p>
+      Cartiglio changes the issue date written in the title block of PDF
+      drawings and documents, many files at once, without going back to the
+      CAD or word-processor files they were exported from.
+    </p>
+    <p xml:lang="it">
+      Cartiglio cambia la data di emissione scritta nel cartiglio di tavole e
+      documenti PDF, tanti file in una volta, senza tornare ai file CAD o di
+      videoscrittura da cui sono stati esportati.
+    </p>
+    <ul>
+      <li>Finds the title block: the corner of a drawing, the cover of a report, every sheet of a set of diagrams</li>
+      <li xml:lang="it">Trova il cartiglio: l'angolo di una tavola, la copertina di una relazione, ogni foglio di una raccolta di schemi</li>
+      <li>Only the most recent dates change by default: earlier revisions keep theirs</li>
+      <li xml:lang="it">Di default cambiano solo le date più recenti: le revisioni precedenti conservano le loro</li>
+      <li>Same font, size, width and direction; the date stays searchable text</li>
+      <li xml:lang="it">Stesso carattere, corpo, larghezza e direzione; la data resta testo ricercabile</li>
+      <li>Before and after preview, and an automatic check that nothing else changed</li>
+      <li xml:lang="it">Anteprima prima e dopo, e un controllo automatico che non sia cambiato nient'altro</li>
+    </ul>
+    <p>
+      The changed copies go to a new folder; the originals are never modified.
+    </p>
+    <p xml:lang="it">
+      Le copie modificate vanno in una cartella nuova; gli originali non
+      vengono mai modificati.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.daniel_g_carrasco.cartiglio.desktop</launchable>
+  <provides>
+    <binary>cartiglio</binary>
+    <mediatype>application/pdf</mediatype>
+  </provides>
+
+  <url type="homepage">https://github.com/daniel-g-carrasco/cartiglio</url>
+  <url type="bugtracker">https://github.com/daniel-g-carrasco/cartiglio/issues</url>
+  <url type="vcs-browser">https://github.com/daniel-g-carrasco/cartiglio</url>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#99c1f1</color>
+    <color type="primary" scheme_preference="dark">#1a5fb4</color>
+  </branding>
+
+  <content_rating type="oars-1.1"/>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+  <requires>
+    <display_length compare="ge">640</display_length>
+  </requires>
+
+  <releases>
+    <release version="1.0.0" date="2026-10-16">
+      <description>
+        <p>First release: dates in the title block of drawings, reports and sets
+           of diagrams, before and after preview, command line, Explorer context
+           menu and update check on Windows, Flatpak on Linux.</p>
+        <p xml:lang="it">Prima versione: date nel cartiglio di tavole, relazioni e
+           raccolte di schemi, anteprima prima e dopo, riga di comando, menu
+           contestuale di Esplora file e controllo aggiornamenti su Windows,
+           Flatpak su Linux.</p>
+      </description>
+    </release>
+  </releases>
+</component>

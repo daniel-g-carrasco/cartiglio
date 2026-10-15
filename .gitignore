@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+build/
+dist/
+.venv/
+venv/
+*.zip
+*.tar.gz
+sample.pdf
+Cartiglio */
+gui/
+gui-*/
+gui-*.png
+locale/
+po/*.pot
+build-dir/
+.flatpak-builder/
+installer/Output/

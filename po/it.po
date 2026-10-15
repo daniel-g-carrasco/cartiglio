@@ -1,0 +1,474 @@
+# Italian translation of Cartiglio.
+# Copyright (C) 2026 Daniel Grasso
+# This file is distributed under the same license as the cartiglio package.
+#
+# Update the template from the source with:
+#   xgettext --from-code=UTF-8 --keyword=_ -o po/cartiglio.pot cartiglio.py
+# and compile with:  python tools/compile_po.py
+msgid ""
+msgstr ""
+"Project-Id-Version: cartiglio 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/daniel-g-carrasco/cartiglio/issues\n"
+"POT-Creation-Date: 2026-10-15 18:00+0200\n"
+"PO-Revision-Date: 2026-10-15 18:00+0200\n"
+"Last-Translator: Daniel Grasso\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# --- core -----------------------------------------------------------------
+
+msgid "the PDF engine is not available ({error}); install it with: pip install pymupdf"
+msgstr "il motore PDF non è disponibile ({error}); installalo con: pip install pymupdf"
+
+msgid "not a readable PDF document"
+msgstr "non è un documento PDF leggibile"
+
+msgid "the PDF is password-protected"
+msgstr "il PDF è protetto da password"
+
+msgid "the PDF has no pages"
+msgstr "il PDF non ha pagine"
+
+msgid "the PDF is digitally signed: changing it would invalidate the signature"
+msgstr "il PDF è firmato digitalmente: modificarlo invaliderebbe la firma"
+
+msgid "check failed: the text of the page changed beyond the dates; the file was not saved"
+msgstr "controllo non superato: il testo della pagina è cambiato oltre alle date; il file non è stato salvato"
+
+msgid "check failed: the page size changed; the file was not saved"
+msgstr "controllo non superato: è cambiato il formato della pagina; il file non è stato salvato"
+
+msgid "check failed: something besides the dates changed on the page; the file was not saved"
+msgstr "controllo non superato: sulla pagina è cambiato qualcosa oltre alle date; il file non è stato salvato"
+
+msgid "the output would overwrite the original"
+msgstr "il file prodotto sovrascriverebbe l'originale"
+
+msgid "1 date in the title block ({dates})"
+msgstr "1 data nel cartiglio ({dates})"
+
+msgid "{n} dates in the title block ({dates})"
+msgstr "{n} date nel cartiglio ({dates})"
+
+msgid "no date in the title block ({n} elsewhere on the page)"
+msgstr "nessuna data nel cartiglio ({n} altrove nella pagina)"
+
+msgid "no date on the first page"
+msgstr "nessuna data nella prima pagina"
+
+msgid "{n} more pages with a title block ({dates})"
+msgstr "altre {n} pagine con cartiglio ({dates})"
+
+msgid "title block also on {n} more pages (not included)"
+msgstr "cartiglio anche su altre {n} pagine (escluse)"
+
+msgid "{k} to change"
+msgstr "{k} da cambiare"
+
+# --- update check -----------------------------------------------------------
+
+msgid "GitHub answered {code}"
+msgstr "GitHub ha risposto {code}"
+
+msgid "unexpected answer from the server"
+msgstr "risposta inattesa dal server"
+
+msgid "cancelled"
+msgstr "annullato"
+
+msgid "download failed ({code})"
+msgstr "download fallito ({code})"
+
+msgid "Installed version: {version}"
+msgstr "Versione installata: {version}"
+
+msgid "Update check failed: {error}"
+msgstr "Controllo aggiornamenti non riuscito: {error}"
+
+msgid "Available: {version}  ({url})"
+msgstr "Disponibile: {version}  ({url})"
+
+msgid "Latest version: {version} (up to date)"
+msgstr "Ultima versione: {version} (aggiornato)"
+
+# --- Windows shell integration -------------------------------------------------
+
+msgid "Change title block dates with Cartiglio"
+msgstr "Cambia le date del cartiglio con Cartiglio"
+
+# --- CLI ------------------------------------------------------------------------
+
+msgid "No PDF files found."
+msgstr "Nessun file PDF trovato."
+
+msgid "title block"
+msgstr "cartiglio"
+
+msgid "elsewhere"
+msgstr "altrove"
+
+msgid "page {n}"
+msgstr "pagina {n}"
+
+msgid "SKIP  {file}  (already exists: {name}; use --overwrite)"
+msgstr "SALTO {file}  (esiste già: {name}; usa --overwrite)"
+
+msgid "SKIP  {file}  ({reason})"
+msgstr "SALTO {file}  ({reason})"
+
+msgid "Changed: {ok}  Skipped: {skipped}  Errors: {errors}"
+msgstr "Modificati: {ok}  Saltati: {skipped}  Errori: {errors}"
+
+msgid "not a valid date: {value} (use dd/mm/yyyy)"
+msgstr "data non valida: {value} (usa gg/mm/aaaa)"
+
+msgid "Change the dates in the title block of PDF drawings and documents, many files at once."
+msgstr "Cambia le date nel cartiglio di tavole e documenti PDF, tanti file in una volta."
+
+msgid "Without arguments the graphical interface (GTK 4) starts. Examples: cartiglio --date 16/10/2026 folder/ | cartiglio --dry-run drawing.pdf"
+msgstr "Senza argomenti si avvia l'interfaccia grafica (GTK 4). Esempi: cartiglio --date 16/10/2026 cartella/ | cartiglio --dry-run tavola.pdf"
+
+msgid "FILE_OR_FOLDER"
+msgstr "FILE_O_CARTELLA"
+
+msgid "PDF files or folders to scan (recursive)"
+msgstr "file PDF o cartelle da esaminare (anche le sottocartelle)"
+
+msgid "the new date (default: today)"
+msgstr "la nuova data (predefinita: oggi)"
+
+msgid "FOLDER"
+msgstr "CARTELLA"
+
+msgid "write the changed files here, keeping the sub-folders (default: a new folder next to the originals, named after the date)"
+msgstr "scrivi qui i file modificati, mantenendo le sottocartelle (predefinito: una cartella nuova accanto agli originali, con la data nel nome)"
+
+msgid "change every date in the title block, older ones too (default: only those equal to the most recent, so earlier revisions keep theirs)"
+msgstr "cambia tutte le date del cartiglio, anche le più vecchie (predefinito: solo quelle uguali alla più recente, così le revisioni precedenti conservano la loro)"
+
+msgid "treat every date on the first page as part of the title block"
+msgstr "considera parte del cartiglio tutte le date della prima pagina"
+
+msgid "also change the title blocks of the later pages (default: only when every sheet has one, as in a set of single-line diagrams)"
+msgstr "cambia anche i cartigli delle pagine successive (predefinito: solo quando ogni foglio ne ha uno, come in una raccolta di schemi unifilari)"
+
+msgid "only change the first page"
+msgstr "cambia solo la prima pagina"
+
+msgid "only list the dates found, write nothing"
+msgstr "elenca solo le date trovate, senza scrivere niente"
+
+msgid "overwrite files already in the output folder"
+msgstr "sovrascrivi i file già presenti nella cartella di destinazione"
+
+msgid "force the graphical interface"
+msgstr "forza l'interfaccia grafica"
+
+msgid "check whether a newer version exists and exit"
+msgstr "controlla se esiste una versione più recente ed esci"
+
+msgid "(Windows) add the entry to the File Explorer context menu for the current user and exit"
+msgstr "(Windows) aggiungi la voce al menu contestuale di Esplora file per l'utente corrente ed esci"
+
+msgid "(Windows) remove the context-menu entry and exit"
+msgstr "(Windows) rimuovi la voce del menu contestuale ed esci"
+
+msgid "Option available on Windows only."
+msgstr "Opzione disponibile solo su Windows."
+
+msgid "Context-menu entry added for the current user."
+msgstr "Voce del menu contestuale aggiunta per l'utente corrente."
+
+msgid "Context-menu entry removed for the current user."
+msgstr "Voce del menu contestuale rimossa per l'utente corrente."
+
+# --- GUI ------------------------------------------------------------------------
+
+msgid "GTK 4 / PyGObject not available. Install:"
+msgstr "GTK 4 / PyGObject non disponibili. Installa:"
+
+msgid "or download the portable build from the GitHub Releases."
+msgstr "oppure scarica la build portable dalle Release su GitHub."
+
+msgid "Headless use:  cartiglio --date DD/MM/YYYY FILE_OR_FOLDER..."
+msgstr "Uso da riga di comando:  cartiglio --date GG/MM/AAAA FILE_O_CARTELLA..."
+
+msgid "Queued"
+msgstr "In coda"
+
+msgid "Dates"
+msgstr "Date"
+
+msgid "Choose which dates to change"
+msgstr "Scegli quali date cambiare"
+
+msgid "Preview"
+msgstr "Anteprima"
+
+msgid "The title block before and after"
+msgstr "Il cartiglio prima e dopo"
+
+msgid "Open folder"
+msgstr "Apri cartella"
+
+msgid "elsewhere on the page"
+msgstr "altrove nella pagina"
+
+msgid "Also the title block of the other {n} pages ({dates})"
+msgstr "Anche il cartiglio delle altre {n} pagine ({dates})"
+
+msgid "For sets of sheets that repeat the title block on every page, like single-line diagrams"
+msgstr "Per le raccolte di fogli con il cartiglio su ogni pagina, come gli schemi unifilari"
+
+msgid "The numbers match the outlines in the preview."
+msgstr "I numeri corrispondono ai riquadri dell'anteprima."
+
+msgid "Changed: {n} dates → {folder}"
+msgstr "Modificato: {n} date → {folder}"
+
+msgid "Preview — {name}"
+msgstr "Anteprima — {name}"
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "Before"
+msgstr "Prima"
+
+msgid "After"
+msgstr "Dopo"
+
+msgid "New date: {date}. The dates to change are outlined in red; the outline appears only here."
+msgstr "Nuova data: {date}. Le date da cambiare sono riquadrate in rosso; il riquadro compare solo qui."
+
+msgid "Preview failed: {error}"
+msgstr "Anteprima non riuscita: {error}"
+
+msgid "Check for updates…"
+msgstr "Controlla aggiornamenti…"
+
+msgid "Preferences"
+msgstr "Preferenze"
+
+msgid "About {app}"
+msgstr "Informazioni su {app}"
+
+msgid "Main menu (F10)"
+msgstr "Menu principale (F10)"
+
+msgid "Working…"
+msgstr "Elaborazione in corso…"
+
+msgid "Clear the list"
+msgstr "Svuota l'elenco"
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Choose files…"
+msgstr "Scegli file…"
+
+msgid "Choose folder…"
+msgstr "Scegli cartella…"
+
+msgid "Drop PDF files or folders here"
+msgstr "Trascina qui file PDF o cartelle"
+
+msgid "The changed copies go to a new folder; the originals are not touched"
+msgstr "Le copie modificate vanno in una cartella nuova; gli originali non vengono toccati"
+
+msgid "The PDF files and the dates found will appear here"
+msgstr "Qui compariranno i file PDF e le date trovate"
+
+msgid "New date"
+msgstr "Nuova data"
+
+msgid "dd/mm/yyyy"
+msgstr "gg/mm/aaaa"
+
+msgid "Calendar"
+msgstr "Calendario"
+
+msgid "Overwrite existing files"
+msgstr "Sovrascrivi i file esistenti"
+
+msgid "Change dates"
+msgstr "Cambia le date"
+
+msgid "Changes the dates in the title block of PDF drawings and documents, many files at once."
+msgstr "Cambia le date nel cartiglio di tavole e documenti PDF, tanti file in una volta."
+
+msgid "Project on GitHub"
+msgstr "Progetto su GitHub"
+
+msgid "PDF engine"
+msgstr "Motore PDF"
+
+msgid "Checking for updates…"
+msgstr "Controllo degli aggiornamenti…"
+
+msgid "Version {version} of {app} is available."
+msgstr "È disponibile la versione {version} di {app}."
+
+msgid "Update…"
+msgstr "Aggiorna…"
+
+msgid "{app} {version} is up to date: no newer version."
+msgstr "{app} {version} è aggiornato: nessuna nuova versione."
+
+msgid "Changing…"
+msgstr "Modifica in corso…"
+
+msgid "Cannot open {name}: {error}"
+msgstr "Impossibile aprire {name}: {error}"
+
+msgid "Choose PDF files"
+msgstr "Scegli i file PDF"
+
+msgid "PDF documents (*.pdf)"
+msgstr "Documenti PDF (*.pdf)"
+
+msgid "All files"
+msgstr "Tutti i file"
+
+msgid "Open"
+msgstr "Apri"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Choose a folder"
+msgstr "Scegli una cartella"
+
+msgid "Looking for dates…"
+msgstr "Ricerca delle date…"
+
+msgid "Error: {error}"
+msgstr "Errore: {error}"
+
+msgid "Skipped: {name} already exists in the output folder (enable Overwrite)"
+msgstr "Saltato: {name} esiste già nella cartella di destinazione (attiva Sovrascrivi)"
+
+msgid "Skipped: no date selected"
+msgstr "Saltato: nessuna data selezionata"
+
+msgid "{n} to change"
+msgstr "{n} da modificare"
+
+msgid "{n} changed"
+msgstr "{n} modificati"
+
+msgid "{n} without dates"
+msgstr "{n} senza date"
+
+msgid "{n} errors"
+msgstr "{n} errori"
+
+msgid "Update available"
+msgstr "Aggiornamento disponibile"
+
+msgid "{app} {version} is available"
+msgstr "{app} {version} è disponibile"
+
+msgid "You are using version {version}."
+msgstr "Stai usando la versione {version}."
+
+msgid "Later"
+msgstr "Più tardi"
+
+msgid "Download and install"
+msgstr "Scarica e installa"
+
+msgid "The installation replaces the current version; the app will close."
+msgstr "L'installazione sostituisce la versione attuale; il programma verrà chiuso."
+
+msgid "Open the download page"
+msgstr "Apri la pagina di download"
+
+msgid "Downloading…"
+msgstr "Scaricamento in corso…"
+
+msgid "Download failed: {error}"
+msgstr "Download non riuscito: {error}"
+
+msgid "Starting the installer…"
+msgstr "Avvio dell'installazione…"
+
+msgid "Cannot start the installer: {error}"
+msgstr "Impossibile avviare l'installer: {error}"
+
+msgid "Automatic (follow the system)"
+msgstr "Automatico (segue il sistema)"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Automatic (system language)"
+msgstr "Automatica (lingua di sistema)"
+
+msgid "Appearance"
+msgstr "Aspetto"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "“Automatic” follows the system settings"
+msgstr "«Automatico» segue le impostazioni di sistema"
+
+msgid "Language"
+msgstr "Lingua"
+
+msgid "Takes effect at the next start"
+msgstr "Ha effetto al prossimo avvio"
+
+msgid "Native Windows decorations"
+msgstr "Decorazioni native di Windows"
+
+msgid "System title bar instead of GTK's (takes effect at the next start)"
+msgstr "Barra del titolo di sistema al posto di quella GTK (ha effetto al prossimo avvio)"
+
+msgid "General"
+msgstr "Generale"
+
+msgid "Check for updates at start-up"
+msgstr "Controlla aggiornamenti all'avvio"
+
+msgid "Once a day, from the project's GitHub Releases"
+msgstr "Una volta al giorno, dalle Release del progetto su GitHub"
+
+msgid "File Explorer"
+msgstr "Esplora file"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "Remove"
+msgstr "Rimuovi"
+
+msgid "“Change title block dates” in the context menu of PDF files and folders"
+msgstr "«Cambia le date del cartiglio» nel menu contestuale di file PDF e cartelle"
+
+msgid "The new language will be used at the next start."
+msgstr "La nuova lingua sarà attiva al prossimo avvio."
+
+msgid "Currently: present (on Windows 11 under “Show more options”)"
+msgstr "Attualmente: presente (su Windows 11 sotto «Mostra altre opzioni»)"
+
+msgid "Currently: not present"
+msgstr "Attualmente: non presente"
+
+msgid "Context-menu entry added."
+msgstr "Voce del menu contestuale aggiunta."
+
+msgid "Registration failed: {error}"
+msgstr "Registrazione non riuscita: {error}"
+
+msgid "Removal failed: {error}"
+msgstr "Rimozione non riuscita: {error}"
