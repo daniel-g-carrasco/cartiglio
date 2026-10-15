@@ -342,8 +342,12 @@ def main() -> int:
         # every line where it was, the new dates (lines of their own) where the old ones were
         assert [(y, t.replace("14/08/2026", "").strip()) for y, t in before_lines] == \
             [(y, t) for y, t in after_lines if t != "16/10/2026"], (before_lines, after_lines)
-        assert sorted(y for y, t in before_lines if "14/08/2026" in t) == \
-            sorted(y for y, t in after_lines if t == "16/10/2026"), after_lines
+        # (top of the box: the substitute font found may have a taller ascender
+        # than the original, on the same baseline)
+        old_y = sorted(y for y, t in before_lines if "14/08/2026" in t)
+        new_y = sorted(y for y, t in after_lines if t == "16/10/2026")
+        assert len(old_y) == len(new_y) and all(abs(a - b) <= 3 for a, b in zip(old_y, new_y)), \
+            after_lines
 
         # --- a report does not take its later pages along ----------------------------
         assert a.later_pages == 0 and not a.all_pages
