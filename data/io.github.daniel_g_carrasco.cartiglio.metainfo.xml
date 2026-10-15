@@ -69,7 +69,7 @@
   </requires>
 
   <releases>
-    <release version="1.0.0" date="2026-10-16">
+    <release version="1.0.0" date="2026-10-15">
       <description>
         <p>First release: dates in the title block of drawings, reports and sets
            of diagrams, before and after preview, command line, Explorer context
