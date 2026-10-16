@@ -437,12 +437,31 @@ def main() -> int:
     assert ct.parse_version("v1.10.2") == (1, 10, 2)
     assert ct.parse_version("2") == (2,)
     assert ct.is_newer("1.2.1", "1.2.0") and not ct.is_newer("1.2.0", "1.2.0")
-    assets = [{"name": "cartiglio-v1.3.0-windows-x64-portable.zip"},
-              {"name": "cartiglio-setup-v1.3.0-windows-x64.exe"},
-              {"name": "cartiglio-v1.3.0-linux-x64-portable.tar.gz"}]
+    def asset(name, **changes):
+        return {"name": name, "url": ct.DOWNLOADS_URL + "v1.3.0/" + name, "size": 9000, "sha256": "ab",
+                **changes}
+    assets = [asset("cartiglio-v1.3.0-windows-x64-portable.zip"),
+              asset("cartiglio-setup-v1.3.0-windows-x64.exe"),
+              asset("cartiglio-v1.3.0-linux-x64-portable.tar.gz")]
     assert ct.pick_asset(assets, installed=True)["name"].endswith(".exe")
     assert ct.pick_asset(assets, installed=False)["name"].endswith(".zip")
     assert ct.pick_asset([], installed=True) is None
+    # the installer, which is run: a released one, from this project, with its checksum
+    setup = "cartiglio-setup-v1.3.0-windows-x64.exe"
+    assert ct.pick_asset([asset(setup, sha256="")], installed=True) is None
+    assert ct.pick_asset([asset(setup, url="https://example.com/" + setup)], installed=True) is None
+    assert ct.pick_asset([asset("cartiglio-setup-vdev-windows-x64.exe")], installed=True) is None
+    # downloaded: checked against its size and checksum, or refused
+    import hashlib
+    with tempfile.TemporaryDirectory() as td:
+        source = Path(td) / "setup.exe"
+        source.write_bytes(b"installer" * 1000)
+        good = hashlib.sha256(source.read_bytes()).hexdigest()
+        got = ct.download_file(source.as_uri(), Path(td) / "got.exe", sha256=good, size=9000)
+        assert got.read_bytes() == source.read_bytes()
+        for kw in ({"sha256": "0" * 64, "size": 9000}, {"sha256": good, "size": 9010}, {"sha256": "", "size": 9000}):
+            expect_raises(ct.UpdateError, ct.download_file, source.as_uri(), Path(td) / "bad.exe", **kw)
+            assert not (Path(td) / "bad.exe").exists() and not (Path(td) / "bad.exe.part").exists()
 
     # --- preferences round-trip ----------------------------------------------
     with tempfile.TemporaryDirectory() as td:
