@@ -33,7 +33,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 APP_ID = "io.github.daniel_g_carrasco.cartiglio"
 APP_NAME = "Cartiglio"
