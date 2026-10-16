@@ -75,6 +75,7 @@ jobs:
           I=dist/cartiglio/_internal
           test -f "$I/gi_typelibs/Gtk-4.0.typelib"
           test -f "$I/gi_typelibs/Adw-1.typelib"
+          test -f "$I/gi_typelibs/GdkWin32-4.0.typelib"   # the text follows 250% monitors
           ls "$I"/libadwaita-1-*.dll
           ls "$I"/libgtk-4-*.dll
           ls "$I"/libmupdf*.dll            # the PDF engine
