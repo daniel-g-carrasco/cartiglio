@@ -60,7 +60,9 @@ modules:
     buildsystem: simple
     build-commands:
       # pure Python, PyGObject and GTK 4 come with the GNOME runtime
-      - install -Dm755 cartiglio.py /app/bin/cartiglio
+      - install -d /app/share/cartiglio
+      - cp -r src/cartiglio /app/share/cartiglio/cartiglio
+      - install -Dm755 bin/cartiglio /app/bin/cartiglio
       - python3 tools/compile_po.py --dest /app/share/locale
       - install -Dm644 data/io.github.daniel_g_carrasco.cartiglio.desktop -t /app/share/applications
       - install -Dm644 data/io.github.daniel_g_carrasco.cartiglio.metainfo.xml -t /app/share/metainfo

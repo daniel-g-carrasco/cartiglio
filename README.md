@@ -93,7 +93,7 @@ sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1
                          sudo dnf install python3-gobject gtk4 libadwaita
                                                            sudo pacman -S python-gobject gtk4 libadwaita
 pip install -r requirements.txt   # pymupdf, fonttools
-python3 cartiglio.py
+python3 bin/cartiglio
 ```
 
 On Windows, use a release build, or MSYS2 (UCRT64):
@@ -142,10 +142,20 @@ moves explicit first, which draws the same page on every version.
 CI (GitHub Actions) builds everything on every push and publishes a release
 for every `v*` tag: Windows with MSYS2 UCRT64 + PyInstaller + Inno Setup,
 Linux with PyInstaller and Flatpak (GNOME 50 runtime). The tag must match
-`__version__` in `cartiglio.py`.
+`__version__` in `src/cartiglio/__init__.py`.
+
+The code is the package `src/cartiglio/`, in four layers with the imports going
+one way only: `core/` (the dates, where the title block is, what was found:
+values in, values out), `data/` (the PDF's content streams as bytes), `app/`
+(a PDF analysed and redated with the PDF engine, the fonts, settings,
+updates, the Windows registry; no toolkit) and `gui/` (the GTK window, the
+only place `gi` is imported). `gui` uses `app`, `app` uses `core` and `data`,
+`core` and `data` know nobody. `tests/test_strati.py` reads the imports and
+fails with file, line and rule.
 
 ```bash
 python tests/test_cartiglio.py     # core, CLI, translations (needs PyMuPDF)
+python tests/test_strati.py        # the layers: every import goes one way
 python tools/compile_po.py         # po/*.po -> locale/ (no gettext tools needed)
 python tools/make_icon.py          # raster icons and installer bitmaps (needs Pillow)
 pyinstaller --noconfirm cartiglio.spec

@@ -23,6 +23,7 @@ jobs:
           python-version: "3.12"
       - run: pip install "pymupdf==${PYMUPDF_VERSION}" fonttools
       - run: python tests/test_cartiglio.py
+      - run: python tests/test_strati.py
       - name: Validate desktop entry and AppStream metadata
         run: |
           sudo apt-get update
@@ -34,7 +35,7 @@ jobs:
       - name: Check that the tag matches __version__
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          v="$(python -c 'import cartiglio as c; print(c.__version__)')"
+          v="$(python -c 'import sys; sys.path.insert(0, "src"); import cartiglio as c; print(c.__version__)')"
           if [ "v$v" != "${GITHUB_REF_NAME}" ]; then
             echo "tag ${GITHUB_REF_NAME} does not match __version__ = $v"; exit 1
           fi

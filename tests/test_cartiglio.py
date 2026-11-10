@@ -12,9 +12,13 @@ import tempfile
 from datetime import date
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-import cartiglio as ct  # noqa: E402
+import cartiglio  # noqa: E402
+from cartiglio import cli, i18n  # noqa: E402
+from cartiglio.app import analyse, batch, minisign, pdf, redate, settings, updates  # noqa: E402
+from cartiglio.core import dates, font_names, model, title_block  # noqa: E402
+from cartiglio.data import content_stream  # noqa: E402
 
 NEW = date(2026, 10, 16)
 
@@ -23,7 +27,7 @@ NEW = date(2026, 10, 16)
 
 
 def _pm():
-    return ct.load_engine()
+    return pdf.load_engine()
 
 
 def drawing(rotate=0, scale_x=1.0, extra=()) -> bytes:
@@ -191,48 +195,48 @@ def main() -> int:
         return 0
     if len(sys.argv) == 3 and sys.argv[1] == "--check-sample":
         text = page_text(sys.argv[2])
-        assert "14/08/2026" not in text and text.count(ct.format_user_date(date.today())) == 4, text
+        assert "14/08/2026" not in text and text.count(dates.format_user_date(date.today())) == 4, text
         assert "02/03/2026" in text
         print("sample changed as expected")
         return 0
 
     # --- dates: what is one, and how it is written again ----------------------
-    found = [m.group(0) for m in ct._DATE_RE.finditer(
+    found = [m.group(0) for m in dates._DATE_RE.finditer(
         "14/08/2026 4.8.26 FK-5-1-12 50-51-51N 14/08/20261 a14/08/2026 1/2/3/2026 31-12-1999")]
     assert found == ["14/08/2026", "4.8.26", "31-12-1999"], found
-    m = ct._DATE_RE.search("31/02/2026")
-    assert ct.parse_date_match(m) is None  # not a calendar date
-    value, style = ct.parse_date_match(ct._DATE_RE.search("4.8.26"))
+    m = dates._DATE_RE.search("31/02/2026")
+    assert dates.parse_date_match(m) is None  # not a calendar date
+    value, style = dates.parse_date_match(dates._DATE_RE.search("4.8.26"))
     assert value == date(2026, 8, 4) and style.format(NEW) == "16.10.26"
-    assert ct.parse_date_match(ct._DATE_RE.search("04/08/2026"))[1].format(date(2027, 1, 2)) == "02/01/2027"
-    assert ct.parse_date_match(ct._DATE_RE.search("4/8/2026"))[1].format(date(2027, 1, 2)) == "2/1/2027"
-    assert ct.parse_user_date("16/10/2026") == NEW == ct.parse_user_date("2026-10-16")
-    assert ct.parse_user_date(" 16.10.26 ") == NEW
+    assert dates.parse_date_match(dates._DATE_RE.search("04/08/2026"))[1].format(date(2027, 1, 2)) == "02/01/2027"
+    assert dates.parse_date_match(dates._DATE_RE.search("4/8/2026"))[1].format(date(2027, 1, 2)) == "2/1/2027"
+    assert dates.parse_user_date("16/10/2026") == NEW == dates.parse_user_date("2026-10-16")
+    assert dates.parse_user_date(" 16.10.26 ") == NEW
     for bad in ("16/13/2026", "", "domani", "2026-02-30"):
-        expect_raises(ValueError, ct.parse_user_date, bad)
-    assert ct.format_user_date(NEW) == "16/10/2026" and ct.date_label(NEW) == "16-10-2026"
+        expect_raises(ValueError, dates.parse_user_date, bad)
+    assert dates.format_user_date(NEW) == "16/10/2026" and dates.date_label(NEW) == "16-10-2026"
 
     # --- fonts: names to installed files / standard fallbacks -------------------
-    assert ct._font_key("HVUAQN+Arial-BoldMT") == "arialbold"
-    assert ct._font_key("ArialNarrow") == "arialnarrow" == ct._font_key("Arial Narrow")
-    assert ct._font_key("TimesNewRomanPSMT") == "timesnewroman"
-    assert ct._split_family("ArialNarrow-Bold") == ("Arial Narrow", "Bold")
-    assert ct._split_family("ABCDEF+ArialMT") == ("Arial", "Regular")
-    assert ct._base14("Arial-BoldItalicMT") == "hebi" and ct._base14("TimesNewRomanPSMT") == "tiro"
-    assert ct._base14("CourierNewPSMT") == "cour" and ct._base14("Helvetica") == "helv"
+    assert font_names._font_key("HVUAQN+Arial-BoldMT") == "arialbold"
+    assert font_names._font_key("ArialNarrow") == "arialnarrow" == font_names._font_key("Arial Narrow")
+    assert font_names._font_key("TimesNewRomanPSMT") == "timesnewroman"
+    assert font_names._split_family("ArialNarrow-Bold") == ("Arial Narrow", "Bold")
+    assert font_names._split_family("ABCDEF+ArialMT") == ("Arial", "Regular")
+    assert font_names._base14("Arial-BoldItalicMT") == "hebi" and font_names._base14("TimesNewRomanPSMT") == "tiro"
+    assert font_names._base14("CourierNewPSMT") == "cour" and font_names._base14("Helvetica") == "helv"
 
     # --- title block zone ------------------------------------------------------
     W, H = 2384, 1684
     words = [(2100, 1500, 2130, 1510, "DATA"), (2000, 1550, 2060, 1560, "REDAZIONE"),
              (100, 100, 130, 110, "DATA")]  # a lone label elsewhere does not move it
-    x0, y0, x1, y1, guessed = ct.title_block_zone((W, H), words, False)
+    x0, y0, x1, y1, guessed = title_block.title_block_zone((W, H), words, False)
     assert not guessed and x1 == W and y1 == H and x0 >= W / 2 and y0 >= H / 2
     assert x0 < 2000 and y0 < 1500
-    *_zone, guessed = ct.title_block_zone((W, H), [], False)
+    *_zone, guessed = title_block.title_block_zone((W, H), [], False)
     assert guessed
-    assert ct.title_block_zone((595, 842), [], True) == (0.0, 0.0, 595, 842, False)
+    assert title_block.title_block_zone((595, 842), [], True) == (0.0, 0.0, 595, 842, False)
 
-    ct.load_engine()  # a clear failure here beats twenty confusing ones below
+    pdf.load_engine()  # a clear failure here beats twenty confusing ones below
 
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
@@ -241,7 +245,7 @@ def main() -> int:
         f = td / "tavola.pdf"
         original = drawing()
         f.write_bytes(original)
-        a = ct.analyse_file(f)
+        a = analyse.analyse_file(f)
         assert not a.is_document and not a.zone_guessed and a.pages == 1
         texts = {d.text: d for d in a.dates}
         assert set(texts) == {"12/05/2025", "02/03/2026", "14/08/2026"}, texts
@@ -249,10 +253,10 @@ def main() -> int:
         assert len(a.block_dates) == 5
         chosen = a.default_selection()
         assert {d.text for d in a.dates if d.index in chosen} == {"14/08/2026"} and len(chosen) == 4
-        assert "5 dates in the title block" in ct.describe(a) and "4 to change" in ct.describe(a)
+        assert "5 dates in the title block" in model.describe(a) and "4 to change" in model.describe(a)
         dest = td / "out" / "tavola.pdf"
         seen = []
-        res = ct.redate_file(a, dest, NEW, progress=seen.append)
+        res = redate.redate_file(a, dest, NEW, progress=seen.append)
         assert res.dest == dest and res.changed == 4
         assert seen == sorted(seen) and seen[-1] == 1.0
         text = page_text(dest)
@@ -262,28 +266,28 @@ def main() -> int:
             "DATA:" in text and "- OK" in text), text                 # neighbours kept
         assert "FK-5-1-12" in text and "31/02/2026" in text
         assert f.read_bytes() == original                             # original untouched
-        expect_raises(FileExistsError, ct.redate_file, a, dest, NEW)
+        expect_raises(FileExistsError, redate.redate_file, a, dest, NEW)
         # every date in the block, older ones included, when asked
-        res = ct.redate_file(a, dest, NEW, {d.index for d in a.block_dates}, overwrite=True)
+        res = redate.redate_file(a, dest, NEW, {d.index for d in a.block_dates}, overwrite=True)
         text = page_text(dest)
         assert res.changed == 5 and "02/03/2026" not in text and "12/05/2025" in text
         # nothing selected
-        expect_raises(ct.NothingToChange, ct.redate_file, a, td / "none.pdf", NEW, set())
-        expect_raises(ct.CartiglioError, ct.redate_file, a, f, NEW, overwrite=True)  # onto itself
+        expect_raises(model.NothingToChange, redate.redate_file, a, td / "none.pdf", NEW, set())
+        expect_raises(model.CartiglioError, redate.redate_file, a, f, NEW, overwrite=True)  # onto itself
 
         # --- the before/after check stops a damaged page ---------------------------
-        real = ct._replace_on_page
+        real = redate._replace_on_page
 
         def sabotage(pymupdf, doc, page, hits, new_date):
             texts = real(pymupdf, doc, page, hits, new_date)
             page.draw_line((300, 300), (900, 900), color=(0, 0, 0), width=3)
             return texts
 
-        ct._replace_on_page = sabotage
+        redate._replace_on_page = sabotage
         try:
-            expect_raises(ct.CartiglioError, ct.redate_file, a, td / "bad.pdf", NEW)
+            expect_raises(model.CartiglioError, redate.redate_file, a, td / "bad.pdf", NEW)
         finally:
-            ct._replace_on_page = real
+            redate._replace_on_page = real
         assert not (td / "bad.pdf").exists() and not list(td.rglob("*.part"))
 
         # --- the new date takes the room of the old one (AutoCAD width factor) -----
@@ -291,7 +295,7 @@ def main() -> int:
             g = td / f"narrow{scale_x}.pdf"
             g.write_bytes(drawing(scale_x=scale_x))
             before = span_widths(g, "14/08/2026")
-            res = ct.redate_file(ct.analyse_file(g), td / "out" / g.name, NEW)
+            res = redate.redate_file(analyse.analyse_file(g), td / "out" / g.name, NEW)
             after = span_widths(res.dest, "16/10/2026")
             # (the date inside "DATA: … - OK" becomes a span of its own: 3 + 1)
             assert len(after) == 4 and before, (before, after)
@@ -301,43 +305,43 @@ def main() -> int:
         for angle in (90, 180, 270):
             g = td / f"rot{angle}.pdf"
             g.write_bytes(drawing(rotate=angle))
-            a = ct.analyse_file(g)
-            assert len(a.default_selection()) == 4, (angle, ct.describe(a))
-            res = ct.redate_file(a, td / "out" / g.name, NEW)
+            a = analyse.analyse_file(g)
+            assert len(a.default_selection()) == 4, (angle, model.describe(a))
+            res = redate.redate_file(a, td / "out" / g.name, NEW)
             text = page_text(res.dest)
             assert text.count("16/10/2026") == 4 and "02/03/2026" in text, angle
 
         # --- a report: the whole cover, formats kept, other pages untouched ----------
         r = td / "relazione.pdf"
         r.write_bytes(report())
-        a = ct.analyse_file(r)
+        a = analyse.analyse_file(r)
         assert a.is_document and a.pages == 3
         assert {d.text for d in a.block_dates} == {"14.08.26", "14/8/2026", "14-08-2026"}
-        res = ct.redate_file(a, td / "out" / r.name, NEW)
+        res = redate.redate_file(a, td / "out" / r.name, NEW)
         text = page_text(res.dest)
         assert "16.10.26" in text and "16/10/2026" in text and "16-10-2026" in text, text
         assert "14/08/2026" in page_text(res.dest, 1)   # page 2 is not the title block
-        pm = ct.load_engine()
+        pm = pdf.load_engine()
         with pm.open(res.dest) as doc:
             assert doc.page_count == 3
 
         # --- lines moved with the leading (MuPDF 1.28 mangles them on its own) --------
-        moves, end = ct.explicit_line_moves(
+        moves, end = content_stream.explicit_line_moves(
             b"q 12 TL BT (a)' 1 2 (b)\" T* 3 -4 TD T* (c)Tj ET Q T*", 0.0)
         assert moves == (b"q 12 TL BT 0 -12 Td (a) Tj 1 Tw 2 Tc 0 -12 Td (b) Tj 0 -12 Td "
                          b"4 TL 3 -4 Td 0 -4 Td (c)Tj ET Q 0 0 Td"), moves
-        assert ct.explicit_line_moves(b"BT /F1 9 Tf (x) Tj ET")[0] is None
+        assert content_stream.explicit_line_moves(b"BT /F1 9 Tf (x) Tj ET")[0] is None
         # strings, hex strings, names and inline images are copied as they are
         tricky = b"BT (it's \\) T* (x)') Tj <2754> Tj ET BI /W 1 ID \x00T*' EI 5 TL T*"
-        moves, _end = ct.explicit_line_moves(tricky)
+        moves, _end = content_stream.explicit_line_moves(tricky)
         assert moves.startswith(b"BT (it's \\) T* (x)') Tj <2754> Tj ET BI /W 1 ID \x00T*' EI"), moves
         assert moves.endswith(b"5 TL 0 -5 Td"), moves
         q = td / "leading.pdf"
         q.write_bytes(leading_block())
         before_lines = lines(q)
-        a = ct.analyse_file(q)
-        assert len(a.default_selection()) == 4, ct.describe(a)
-        res = ct.redate_file(a, td / "out" / q.name, NEW)
+        a = analyse.analyse_file(q)
+        assert len(a.default_selection()) == 4, model.describe(a)
+        res = redate.redate_file(a, td / "out" / q.name, NEW)
         after_lines = lines(res.dest)
         # every line where it was, the new dates (lines of their own) where the old ones were
         assert [(y, t.replace("14/08/2026", "").strip()) for y, t in before_lines] == \
@@ -349,38 +353,78 @@ def main() -> int:
         assert len(old_y) == len(new_y) and all(abs(a - b) <= 3 for a, b in zip(old_y, new_y)), \
             after_lines
 
+        # --- a date in the middle of a string of a TJ array (MuPDF 1.28.6 miscounts the gap) ----
+        # one string per character code: the numbers stay, escapes are read, q and Q keep the font
+        split, font = content_stream.split_shown_strings(
+            b"q /F1 9 Tf BT [(AB) -20 <4344> (\\(E\\051\\\\)] TJ Q [(xy)] TJ /F2 9 Tf [<00410042>] TJ (zz) Tj",
+            {"F1": 1, "F2": 2})
+        assert split == (b"q /F1 9 Tf BT [<41><42> -20 <43><44><28><45><29><5c>] TJ Q [(xy)] TJ "
+                         b"/F2 9 Tf [<0041><0042>] TJ (zz) Tj"), split
+        assert font == "F2"
+        assert content_stream.split_shown_strings(b"[(ab)] TJ", {"F1": 1}, "F1")[0] == b"[<61><62>] TJ"
+        # a font that is not known, half a character code, nothing to split: left as they are
+        assert content_stream.split_shown_strings(b"/F9 9 Tf [(abc)] TJ", {"F1": 1})[0] is None
+        assert content_stream.split_shown_strings(b"/F2 9 Tf [<004100>] TJ", {"F2": 2})[0] is None
+        assert content_stream.split_shown_strings(b"/F1 9 Tf [(a) 5 (b)] TJ (abc) Tj", {"F1": 1})[0] is None
+        # the line of the title block written as AutoCAD and Word write it: kerned, the date
+        # inside a string; what follows the date must stay where it was
+        shown = b"<" + b"DATA: 14/08/2026 - OK".hex().encode() + b">"
+        with pm.open(stream=drawing(), filetype="pdf") as doc:
+            page = doc[0]
+            xref = next(x for x in page.get_contents() if shown in doc.xref_stream(x))
+            doc.update_stream(xref, doc.xref_stream(xref).replace(
+                b"[" + shown + b"]TJ", b"[(DA) -30 (TA: 14/08/20) 15 (26 - OK)] TJ"))
+            assert b"(TA: 14/08/20)" in doc.xref_stream(xref)
+            kerned = doc.tobytes()
+
+        def places(source, *words):
+            with (pm.open(stream=source, filetype="pdf") if isinstance(source, bytes) else pm.open(source)) as doc:
+                return [(w[4], round(w[0], 1), round(w[1], 1)) for w in doc[0].get_text("words") if w[4] in words]
+
+        with pm.open(stream=kerned, filetype="pdf") as doc:
+            picture = doc[0].get_pixmap().samples
+            redate._split_shown_strings(doc, doc[0])
+            assert b"<44><41> -30 <54><41>" in b"".join(doc.xref_stream(x) for x in doc[0].get_contents())
+            assert doc[0].get_pixmap().samples == picture       # the same page, drawn the same
+        q = td / "kerned.pdf"
+        q.write_bytes(kerned)
+        was = places(kerned, "-", "OK", "DATA:")
+        assert [w for w, _x, _y in was] == ["DATA:", "-", "OK"], was
+        res = redate.redate_file(analyse.analyse_file(q), td / "out" / q.name, NEW)
+        assert places(res.dest, "-", "OK", "DATA:") == was, (was, places(res.dest, "-", "OK", "DATA:"))
+
         # --- a report does not take its later pages along ----------------------------
         assert a.later_pages == 0 and not a.all_pages
 
         # --- single-line diagrams: the block repeated on every sheet -----------------
         s = td / "unifilari.pdf"
         s.write_bytes(diagrams())
-        a = ct.analyse_file(s)
-        assert a.repeated and a.all_pages and a.later_pages == 6, ct.describe(a)
+        a = analyse.analyse_file(s)
+        assert a.repeated and a.all_pages and a.later_pages == 6, model.describe(a)
         later = [d for d in a.dates if d.page > 0]
         assert len(later) == 6 and {d.text for d in later} == {"29/05/2026"}  # not the CEI date
-        assert "6 more pages with a title block (29/05/2026)" in ct.describe(a)
-        res = ct.redate_file(a, td / "out" / s.name, NEW)
+        assert "6 more pages with a title block (29/05/2026)" in model.describe(a)
+        res = redate.redate_file(a, td / "out" / s.name, NEW)
         assert res.changed == 7
         for n in range(1, 7):
             text = page_text(res.dest, n)
             assert "16/10/2026" in text and "29/05/2026" not in text, (n, text)
         assert "01/06/2024" in page_text(res.dest, 2)
-        before_png, after_png = ct.preview_png(a, NEW, page=3)
+        before_png, after_png = redate.preview_png(a, NEW, page=3)
         assert after_png.startswith(b"\x89PNG")
         # ...unless told to stay on the first page, or the sheets differ
-        a = ct.analyse_file(s, all_pages=False)
+        a = analyse.analyse_file(s, all_pages=False)
         assert not a.all_pages and len(a.default_selection()) == 1
-        res = ct.redate_file(a, td / "out" / "first.pdf", NEW)
+        res = redate.redate_file(a, td / "out" / "first.pdf", NEW)
         assert "29/05/2026" in page_text(res.dest, 1)
-        a = ct.analyse_file(s)
+        a = analyse.analyse_file(s)
         a.all_pages = False   # the GUI switch
-        assert len(a.default_selection()) == 1 and "not included" in ct.describe(a)
+        assert len(a.default_selection()) == 1 and "not included" in model.describe(a)
 
         # --- previews: before and after pictures, nothing written --------------------
-        before_png, after_png = ct.preview_png(a, NEW)
+        before_png, after_png = redate.preview_png(a, NEW)
         assert before_png.startswith(b"\x89PNG") and after_png.startswith(b"\x89PNG")
-        assert ct.preview_png(a, NEW, set())[1] is None
+        assert redate.preview_png(a, NEW, set())[1] is None
 
         # --- no dates, not a PDF, password -------------------------------------------
         blank = td / "blank.pdf"
@@ -388,71 +432,71 @@ def main() -> int:
         doc.new_page()
         doc.save(blank)
         doc.close()
-        a = ct.analyse_file(blank)
-        assert not a.dates and ct.describe(a) == "no date on the first page"
-        expect_raises(ct.NothingToChange, ct.redate_file, a, td / "x.pdf", NEW)
+        a = analyse.analyse_file(blank)
+        assert not a.dates and model.describe(a) == "no date on the first page"
+        expect_raises(model.NothingToChange, redate.redate_file, a, td / "x.pdf", NEW)
         junk = td / "junk.pdf"
         junk.write_bytes(b"this is not a PDF at all\n" * 20)
-        expect_raises(ct.CartiglioError, ct.analyse_file, junk)
+        expect_raises(model.CartiglioError, analyse.analyse_file, junk)
         locked = td / "locked.pdf"
         doc = pm.open(stream=drawing(), filetype="pdf")
         doc.save(locked, encryption=pm.PDF_ENCRYPT_AES_256, user_pw="u", owner_pw="o")
         doc.close()
-        expect_raises(ct.CartiglioError, ct.analyse_file, locked)
+        expect_raises(model.CartiglioError, analyse.analyse_file, locked)
 
         # --- names with spaces, plus signs and accents ---------------------------------
         odd = td / "RC_ie06_ill.+fm_ piano terrà-RC_ie06.pdf"
         odd.write_bytes(drawing())
-        res = ct.redate_file(ct.analyse_file(odd), td / "out" / odd.name, NEW)
+        res = redate.redate_file(analyse.analyse_file(odd), td / "out" / odd.name, NEW)
         assert res.dest.read_bytes().startswith(b"%PDF-")
 
         # --- where the output goes ------------------------------------------------------
         root = td / "consegna"
-        assert ct.output_path(root / "ELE" / "a.pdf", root, NEW) == \
+        assert batch.output_path(root / "ELE" / "a.pdf", root, NEW) == \
             td / "consegna - 16-10-2026" / "ELE" / "a.pdf"
-        assert ct.output_path(td / "a.pdf", None, NEW) == td / "Cartiglio 16-10-2026" / "a.pdf"
-        assert ct.output_path(root / "ELE" / "a.pdf", root, NEW, td / "x") == td / "x" / "ELE" / "a.pdf"
-        assert ct.output_path(td / "a.pdf", None, NEW, td / "x") == td / "x" / "a.pdf"
+        assert batch.output_path(td / "a.pdf", None, NEW) == td / "Cartiglio 16-10-2026" / "a.pdf"
+        assert batch.output_path(root / "ELE" / "a.pdf", root, NEW, td / "x") == td / "x" / "ELE" / "a.pdf"
+        assert batch.output_path(td / "a.pdf", None, NEW, td / "x") == td / "x" / "a.pdf"
 
         # --- folder scan and CLI -----------------------------------------------------------
         (root / "ELE").mkdir(parents=True)
         (root / "ELE" / "T1.PDF").write_bytes(drawing())
         (root / "R.pdf").write_bytes(report(1))
         (root / "ELE" / "notes.txt").write_text("x")
-        found = ct.iter_pdf([root])
+        found = batch.iter_pdf([root])
         assert [p.name for p, _r in found] == ["T1.PDF", "R.pdf"] or \
             sorted(p.name for p, _r in found) == ["R.pdf", "T1.PDF"]
         assert all(r == root for _p, r in found)
-        assert ct.run_cli([root], NEW, False, None, False, False, True) == 0      # dry run
+        assert cli.run_cli([root], NEW, False, None, False, False, True) == 0      # dry run
         assert not (td / "consegna - 16-10-2026").exists()
-        assert ct.run_cli([root], NEW, False, None, False, False, False) == 0
+        assert cli.run_cli([root], NEW, False, None, False, False, False) == 0
         out = td / "consegna - 16-10-2026"
         assert (out / "ELE" / "T1.PDF").is_file() and (out / "R.pdf").is_file()
-        assert ct.run_cli([root], NEW, False, None, False, False, False) == 0     # all skipped
+        assert cli.run_cli([root], NEW, False, None, False, False, False) == 0     # all skipped
         (root / "bad.pdf").write_bytes(b"nope")
-        assert ct.run_cli([root], NEW, True, None, False, False, False) == 1      # one error
-        assert ct.run_cli([td / "missing"], NEW, False, None, False, False, False) == 1
+        assert cli.run_cli([root], NEW, True, None, False, False, False) == 1      # one error
+        assert cli.run_cli([td / "missing"], NEW, False, None, False, False, False) == 1
 
     # --- update check helpers (no network) ---------------------------------
-    assert ct.parse_version("v1.10.2") == (1, 10, 2)
-    assert ct.parse_version("2") == (2,)
-    assert ct.is_newer("1.2.1", "1.2.0") and not ct.is_newer("1.2.0", "1.2.0")
+    assert updates.parse_version("v1.10.2") == (1, 10, 2)
+    assert updates.parse_version("2") == (2,)
+    assert updates.is_newer("1.2.1", "1.2.0") and not updates.is_newer("1.2.0", "1.2.0")
     def asset(name, **changes):
-        return {"name": name, "url": ct.DOWNLOADS_URL + "v1.3.0/" + name, "size": 9000, "sha256": "ab", "signature_url": ct.DOWNLOADS_URL + "v1.3.0/" + name + ".minisig",
+        return {"name": name, "url": cartiglio.DOWNLOADS_URL + "v1.3.0/" + name, "size": 9000, "sha256": "ab", "signature_url": cartiglio.DOWNLOADS_URL + "v1.3.0/" + name + ".minisig",
                 **changes}
     assets = [asset("cartiglio-v1.3.0-windows-x64-portable.zip"),
               asset("cartiglio-setup-v1.3.0-windows-x64.exe"),
               asset("cartiglio-v1.3.0-linux-x64-portable.tar.gz")]
-    assert ct.pick_asset(assets, installed=True)["name"].endswith(".exe")
-    assert ct.pick_asset(assets, installed=False)["name"].endswith(".zip")
-    assert ct.pick_asset([], installed=True) is None
+    assert updates.pick_asset(assets, installed=True)["name"].endswith(".exe")
+    assert updates.pick_asset(assets, installed=False)["name"].endswith(".zip")
+    assert updates.pick_asset([], installed=True) is None
     # the installer, which is run: a released one, from this project, with its checksum
     setup = "cartiglio-setup-v1.3.0-windows-x64.exe"
-    assert ct.pick_asset([asset(setup, sha256="")], installed=True) is None
-    assert ct.pick_asset([asset(setup, url="https://example.com/" + setup)], installed=True) is None
-    assert ct.pick_asset([asset("cartiglio-setup-vdev-windows-x64.exe")], installed=True) is None
-    assert ct.pick_asset([asset(setup, signature_url="")], installed=True) is None          # not signed
-    assert ct.pick_asset([asset(setup, signature_url="https://example.com/s.minisig")], installed=True) is None
+    assert updates.pick_asset([asset(setup, sha256="")], installed=True) is None
+    assert updates.pick_asset([asset(setup, url="https://example.com/" + setup)], installed=True) is None
+    assert updates.pick_asset([asset("cartiglio-setup-vdev-windows-x64.exe")], installed=True) is None
+    assert updates.pick_asset([asset(setup, signature_url="")], installed=True) is None          # not signed
+    assert updates.pick_asset([asset(setup, signature_url="https://example.com/s.minisig")], installed=True) is None
     # the releases' minisign signature: Ed25519 against RFC 8032's vectors
     import hashlib
     for public, message, signature in (
@@ -463,8 +507,8 @@ def main() -> int:
              "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eae"
              "b4302aeeb00d291612bb0c00")):
         public, message, signature = bytes.fromhex(public), bytes.fromhex(message), bytes.fromhex(signature)
-        assert ct.ed25519_verify(public, message, signature)
-        assert not ct.ed25519_verify(public, message + b"x", signature)
+        assert minisign.ed25519_verify(public, message, signature)
+        assert not minisign.ed25519_verify(public, message + b"x", signature)
     # signatures made by minisign 0.12 with a key of the tests' own
     test_key = "RWR7SJiRpYyOYfMs5NsaotSrG3B4wGxiTvXOWkzu4JCT3e240QSuHElq"
     signed_got = ("untrusted comment: signature from minisign secret key\n"
@@ -476,17 +520,17 @@ def main() -> int:
                     "trusted comment: timestamp:1792398099 file:other.exe hashed\n"
                     "L5a1c0bubqCfk4+ZchcJRRg8+Bi2WpL63yOy2uQk4amVYDJdN/fSCGPcny6gaY+7CpQmwcUAk8p4JXkFjaiUCQ==\n")
     payload_digest = hashlib.blake2b(b"installer" * 1000, digest_size=64).digest()
-    assert ct.minisign_verify(payload_digest, signed_got, test_key) == "timestamp:1792398099 file:got.exe hashed"
-    expect_raises(ValueError, ct.minisign_verify, hashlib.blake2b(b"other", digest_size=64).digest(), signed_got,
+    assert minisign.minisign_verify(payload_digest, signed_got, test_key) == "timestamp:1792398099 file:got.exe hashed"
+    expect_raises(ValueError, minisign.minisign_verify, hashlib.blake2b(b"other", digest_size=64).digest(), signed_got,
                   test_key)
-    expect_raises(ValueError, ct.minisign_verify, payload_digest, signed_got, ct.UPDATE_PUBLIC_KEY)    # another key
+    expect_raises(ValueError, minisign.minisign_verify, payload_digest, signed_got, updates.UPDATE_PUBLIC_KEY)    # another key
     forged = signed_got.split("\n")
     forged[2] = signed_other.split("\n")[2]                    # another file's name, the comment's signature kept
-    expect_raises(ValueError, ct.minisign_verify, payload_digest, "\n".join(forged), test_key)
-    expect_raises(ValueError, ct.minisign_verify, payload_digest, "Not Found", test_key)
+    expect_raises(ValueError, minisign.minisign_verify, payload_digest, "\n".join(forged), test_key)
+    expect_raises(ValueError, minisign.minisign_verify, payload_digest, "Not Found", test_key)
     # downloaded: checked against its size, its checksum and its signature (for
     # this very file, by this project's key), or refused
-    real_key, ct.UPDATE_PUBLIC_KEY = ct.UPDATE_PUBLIC_KEY, test_key
+    real_key, updates.UPDATE_PUBLIC_KEY = updates.UPDATE_PUBLIC_KEY, test_key
     try:
         with tempfile.TemporaryDirectory() as td:
             source = Path(td) / "setup.exe"
@@ -495,7 +539,7 @@ def main() -> int:
             for name, text in (("got.minisig", signed_got), ("other.minisig", signed_other)):
                 (Path(td) / name).write_text(text, encoding="utf-8")
             signature = (Path(td) / "got.minisig").as_uri()
-            got = ct.download_file(source.as_uri(), Path(td) / "got.exe", sha256=good, size=9000,
+            got = updates.download_file(source.as_uri(), Path(td) / "got.exe", sha256=good, size=9000,
                                    signature_url=signature)
             assert got.read_bytes() == source.read_bytes()
             got.unlink()
@@ -505,37 +549,37 @@ def main() -> int:
                                   ("got.exe", {"signature_url": source.as_uri()}),
                                   ("other-name.exe", {})):
                 kw = {"sha256": good, "size": 9000, "signature_url": signature, **changes}
-                expect_raises(ct.UpdateError, ct.download_file, source.as_uri(), Path(td) / dest, **kw)
+                expect_raises(updates.UpdateError, updates.download_file, source.as_uri(), Path(td) / dest, **kw)
                 assert not (Path(td) / dest).exists() and not (Path(td) / (dest + ".part")).exists()
-            ct.UPDATE_PUBLIC_KEY = real_key                   # the project's own: not the one that signed it
-            expect_raises(ct.UpdateError, ct.download_file, source.as_uri(), Path(td) / "got.exe",
+            updates.UPDATE_PUBLIC_KEY = real_key                   # the project's own: not the one that signed it
+            expect_raises(updates.UpdateError, updates.download_file, source.as_uri(), Path(td) / "got.exe",
                           sha256=good, size=9000, signature_url=signature)
     finally:
-        ct.UPDATE_PUBLIC_KEY = real_key
+        updates.UPDATE_PUBLIC_KEY = real_key
     # the release workflow checks its signatures with the key the code trusts
     workflow = (Path(__file__).resolve().parent.parent / ".github" / "workflows" / "build.yml")
-    assert f"PUBLIC_KEY: {ct.UPDATE_PUBLIC_KEY}\n" in workflow.read_text(encoding="utf-8")
+    assert f"PUBLIC_KEY: {updates.UPDATE_PUBLIC_KEY}\n" in workflow.read_text(encoding="utf-8")
 
     # --- preferences round-trip ----------------------------------------------
     with tempfile.TemporaryDirectory() as td:
         ini = Path(td) / "cfg" / "settings.ini"
-        s = ct.Settings(ini)
+        s = settings.Settings(ini)
         assert s.get_bool("check_updates") and s.get("last_update_check") == ""
         s.set("check_updates", False)
-        again = ct.Settings(ini)
+        again = settings.Settings(ini)
         assert not again.get_bool("check_updates")
         assert again.get_bool("system_title_bar")  # untouched default survives
 
     # --- command line -----------------------------------------------------------
-    ns, unknown = ct.build_parser().parse_known_args(["--gui", "a.pdf", "--future-flag"])
+    ns, unknown = cli.build_parser().parse_known_args(["--gui", "a.pdf", "--future-flag"])
     assert ns.gui and ns.paths == ["a.pdf"] and unknown == ["--future-flag"]
-    ns = ct.build_parser().parse_args(["--date", "16.10.2026", "--all", "x.pdf"])
+    ns = cli.build_parser().parse_args(["--date", "16.10.2026", "--all", "x.pdf"])
     assert ns.date == NEW and ns.every_date and not ns.whole_page
     import contextlib
     import io
     for bad in (["--date", "32/10/2026"], ["--date", "ieri"]):
         with contextlib.redirect_stderr(io.StringIO()):
-            expect_raises(SystemExit, ct.build_parser().parse_args, bad)
+            expect_raises(SystemExit, cli.build_parser().parse_args, bad)
 
     # --- translations: po -> mo compiler and gettext plumbing ----------------
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
@@ -545,14 +589,15 @@ def main() -> int:
         written = compile_po.compile_all(root / "po", Path(td))
         assert [lang for lang, _count, _out in written] == ["it"]
         import gettext
-        it = gettext.translation(ct.TEXTDOMAIN, td, languages=["it"])
+        it = gettext.translation(cartiglio.TEXTDOMAIN, td, languages=["it"])
         assert it.gettext("Queued") == "In coda"
         assert it.gettext("not a translated string") == "not a translated string"
     # every msgid in the catalogue must exist in the source, and every
     # translatable string of the source must be in the catalogue (adjacent
     # string literals split over lines are joined first)
     import re
-    source = re.sub(r'"\s*\n\s*"', "", (root / "cartiglio.py").read_text(encoding="utf-8"))
+    source = re.sub(r'"\s*\n\s*"', "", "\n".join(p.read_text(encoding="utf-8")
+                                                    for p in sorted((root / "src" / "cartiglio").rglob("*.py"))))
     entries = compile_po.parse_po(root / "po" / "it.po")
     missing = [m for m in entries if m and m not in source]
     assert not missing, f"msgids not found in the source: {missing[:5]}"
@@ -564,7 +609,7 @@ def main() -> int:
     for msgid, msgstr in entries.items():
         if msgid:
             assert sorted(re.findall(r"\{\w+\}", msgid)) == sorted(re.findall(r"\{\w+\}", msgstr)), msgid
-    assert ct.detect_language() in ct.LANGUAGES
+    assert i18n.detect_language() in i18n.LANGUAGES
 
     # --- icons: gdk-pixbuf must be able to sniff them ------------------------
     # It only looks for the <svg> element in the first 256 bytes; past that the

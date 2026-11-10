@@ -2,7 +2,7 @@
 ; Compiled by CI with:  ISCC.exe /DAppVersion=X.Y.Z installer\cartiglio.iss
 ; Expects the PyInstaller output in dist\cartiglio (repo root).
 ;
-; The registry layout below mirrors win_register() in cartiglio.py
+; The registry layout below mirrors win_register() in src/cartiglio/app/windows_shell.py
 ; (verb Cartiglio.redate, on PDF files and on folders): keep them in sync.
 ; Every user-visible string lives in [CustomMessages], once per language.
 

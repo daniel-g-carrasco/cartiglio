@@ -74,7 +74,8 @@ if WIN:
 GI_VERSIONS = {'Gtk': '4.0', 'Gdk': '4.0', 'Adw': '1'}
 
 a = Analysis(
-    ['cartiglio.py'],
+    [os.path.join(SPECPATH, 'build-aux', 'windows', 'cartiglio_main.py')],
+    pathex=[os.path.join(SPECPATH, 'src')],
     binaries=binaries,
     datas=datas,
     # imported lazily (load_engine(), _subset_font()), so declare them
