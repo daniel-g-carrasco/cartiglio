@@ -27,18 +27,27 @@ identity.
 from __future__ import annotations
 
 import os
+import sys
 import time
 from pathlib import Path
 
-__version__ = "1.1.6"
+__version__ = "1.1.7"
+
+WINDOWS = sys.platform == "win32"
 
 APP_ID = "io.github.daniel_g_carrasco.cartiglio"
 APP_NAME = "Cartiglio"
+SLUG = "cartiglio"                  # the repository, the binary on Linux, the file names of a release
+EXE_NAME = "cartiglio"              # the Windows executable (cartiglio.spec) and its folders under %LOCALAPPDATA%
+ENV_PREFIX = "CARTIGLIO"            # the developer aids: CARTIGLIO_STARTUP_LOG and the like
 GITHUB_REPO = "daniel-g-carrasco/cartiglio"
-RELEASES_URL = f"https://github.com/{GITHUB_REPO}/releases"
-DOWNLOADS_URL = f"https://github.com/{GITHUB_REPO}/releases/download/"
-LATEST_RELEASE_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
-TEXTDOMAIN = "cartiglio"
+WEBSITE = f"https://github.com/{GITHUB_REPO}"
+# The releases' signing key (minisign), the one shared by the author's apps
+# (key id CEFFF9269F08F845). The secret half is the CI's MINISIGN_SECRET_KEY;
+# tests/test_cartiglio.py checks that the release workflow verifies its
+# signatures with this very key.
+PUBLIC_KEY = "RWRF+AifJvn/zhz0o7MBObIYHgw9+sWoc4GaBK+qYnJY0AqeJm540y0a"
+TEXTDOMAIN = SLUG
 
 # Windows shell integration identifier (see the "Windows" section below and
 # installer/cartiglio.iss, which must stay in sync with it).
@@ -51,7 +60,7 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 
 def _mark(label: str) -> None:
     """Start-up profiling aid: append a timestamp to $CARTIGLIO_STARTUP_LOG."""
-    path = os.environ.get("CARTIGLIO_STARTUP_LOG")
+    path = os.environ.get(f"{ENV_PREFIX}_STARTUP_LOG")
     if path:
         try:
             with open(path, "a", encoding="utf-8") as f:

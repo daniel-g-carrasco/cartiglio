@@ -6,12 +6,14 @@ import os
 import sys
 from datetime import date
 
-from cartiglio.app.settings import Settings
+from cartiglio.app import log
+from cartiglio.app.config import Settings
+from cartiglio.app.services import setup_language
 from cartiglio.app.windows_shell import win_register, win_unregister
 
-from . import _mark
+from . import SLUG, _mark
 from .cli import build_parser, run_check_update, run_cli
-from .i18n import _, setup_i18n
+from .i18n import _
 
 
 def main() -> int:
@@ -29,8 +31,9 @@ def main() -> int:
         except (AttributeError, ValueError):
             pass
 
+    log.setup(SLUG)
     settings = Settings()
-    setup_i18n(settings.get("language"))
+    setup_language(settings.get("language"))
     args = build_parser().parse_args()
 
     if args.check_update:
@@ -49,6 +52,13 @@ def main() -> int:
     if args.paths and not args.gui:
         return run_cli(args.paths, args.date or date.today(), args.overwrite, args.out,
                        args.every_date, args.whole_page, args.dry_run, args.all_pages)
+    # the window's errors kept in a file too (app/errorlog.py: errors.log in
+    # the state folder, rotated past 1 MB): started from File Explorer's menu
+    # or the Start menu nobody reads stderr, and the built app has none. The
+    # command line above speaks in its terminal, as before.
+    from cartiglio.app import errorlog
+    from cartiglio.app.services import app_paths
+    errorlog.install(errorlog.log_file(app_paths().state))
     from cartiglio.gui.application import run_gui           # the toolkit, only when a window is wanted
     return run_gui(sys.argv, settings)
 

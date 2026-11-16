@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import configparser
+import io
 import os
 import sys
 from pathlib import Path
+
+from cartiglio.data import atomic
 
 
 def config_dir() -> Path:
@@ -27,8 +30,10 @@ class Settings:
         "color_scheme": "auto",        # auto (follow the system) | light | dark
         # Windows: the system title bar (and so Snap) rather than GTK's
         "system_title_bar": "true",
-        "check_updates": "true",       # Windows: look for a new release daily
-        "last_update_check": "",       # ISO date of the last automatic check
+        "check_updates": "true",       # Windows: look for a new release, every 4 hours at most
+        # when the last automatic check was made, "2026-11-16T10:23:05"
+        # (a date alone, as the once-a-day check wrote it, counts from its midnight)
+        "last_update_check": "",
     }
 
     def __init__(self, path: Path | None = None):
@@ -53,9 +58,13 @@ class Settings:
         self.save()
 
     def save(self) -> None:
+        """Written whole or not at all (data/atomic.py: a temporary file
+        renamed over the old one, the rename tried again for a moment when
+        Windows refuses it, as an antivirus holding the file just written
+        makes it do)."""
+        text = io.StringIO()
+        self._cp.write(text)
         try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.path, "w", encoding="utf-8") as f:
-                self._cp.write(f)
+            atomic.write_bytes(self.path, text.getvalue().encode("utf-8"))
         except OSError:
             pass  # preferences are a convenience, never fatal

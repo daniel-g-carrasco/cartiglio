@@ -17,6 +17,11 @@ ICON = 'assets/icon.ico' if WIN else None
 datas = [('data/icons', 'share/icons')]
 binaries = []
 
+# The licence's text goes with every copy of the program (the AGPL asks for
+# it): in _internal/licenses, so the installer, the portable zip and the
+# Linux archive all carry it.
+datas.append((os.path.join(SPECPATH, 'LICENSE'), 'licenses'))
+
 # The PDF engine: PyMuPDF (MuPDF), whose extension modules PyInstaller's own
 # hook collects, plus its licence texts (dist-info). On Windows it is the
 # MSYS2 package (mingw-w64-ucrt-x86_64-python-pymupdf), linked to the shared

@@ -14,7 +14,6 @@ from cartiglio.app.analyse import analyse_file
 from cartiglio.app.batch import iter_pdf, output_path
 from cartiglio.app.pdf import load_engine
 from cartiglio.app.redate import redate_file
-from cartiglio.app.updates import UpdateError, fetch_latest_release, is_newer
 from cartiglio.core.dates import parse_user_date
 from cartiglio.core.model import CartiglioError, NothingToChange, describe
 
@@ -24,16 +23,22 @@ from .i18n import _
 def run_check_update() -> int:
     """`--check-update`: print the latest release. Exit 0 when GitHub answered
     (up to date or not), 3 when the network/TLS layer failed."""
+    import urllib.error
+
+    from cartiglio.app import services, updates
     print(_("Installed version: {version}").format(version=__version__))
     try:
-        rel = fetch_latest_release()
-    except UpdateError as e:
+        rel = updates.latest_release(services.project())
+    except updates.UpdateError as e:
         print(_("Update check failed: {error}").format(error=e), file=sys.stderr)
-        return 0 if e.reached else 3
-    if is_newer(rel["version"]):
-        print(_("Available: {version}  ({url})").format(version=rel["version"], url=rel["url"]))
+        # GitHub answered, with an error (no release yet, the limit of the
+        # requests): the network and TLS work, which is what this checks
+        reached = isinstance(e, updates.NoRelease) or isinstance(e.__context__, urllib.error.HTTPError)
+        return 0 if reached else 3
+    if updates.is_newer(rel.version, __version__):
+        print(_("Available: {version}  ({url})").format(version=rel.version, url=rel.url))
     else:
-        print(_("Latest version: {version} (up to date)").format(version=rel["version"]))
+        print(_("Latest version: {version} (up to date)").format(version=rel.version))
     return 0
 
 

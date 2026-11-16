@@ -9,8 +9,6 @@ import sys
 from cartiglio import PACKAGE_DIR, WIN_VERB
 from cartiglio.i18n import _
 
-from .updates import is_frozen
-
 # One context-menu entry on PDF files and on folders: files and whole
 # deliveries are both things one re-dates. Nothing else is registered.
 # The installer writes the same keys (HKLM when installed for all users);
@@ -19,6 +17,11 @@ _VERB_KEYS = (
     rf"Software\Classes\SystemFileAssociations\.pdf\shell\{WIN_VERB}",
     rf"Software\Classes\Directory\shell\{WIN_VERB}",
 )
+
+
+def is_frozen() -> bool:
+    """The built app (PyInstaller), not a run from the sources."""
+    return bool(getattr(sys, "frozen", False))
 
 
 def _launch_command() -> str:

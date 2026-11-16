@@ -22,8 +22,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install "pymupdf==${PYMUPDF_VERSION}" fonttools
-      - run: python tests/test_cartiglio.py
-      - run: python tests/test_strati.py
+      # every test module, the model's shared ones too, with a limit per test
+      # (tools/run_tests_config.py); a write in the user's folders fails it
+      - run: python tools/run_tests.py tests
       - name: Validate desktop entry and AppStream metadata
         run: |
           sudo apt-get update
@@ -66,7 +67,7 @@ jobs:
       - name: Test suite under the MSYS2 Python
         run: |
           python -c "import pymupdf; print('PyMuPDF', pymupdf.VersionBind)"
-          python tests/test_cartiglio.py
+          python tools/run_tests.py tests
       - name: Build with PyInstaller
         run: |
           python tools/compile_po.py
@@ -84,6 +85,7 @@ jobs:
           test -f "$I/certs/ca-bundle.crt" # TLS for the update check
           test -f "$I/share/icons/hicolor/scalable/apps/io.github.daniel_g_carrasco.cartiglio.svg"
           test -f "$I/share/locale/it/LC_MESSAGES/cartiglio.mo"
+          grep -q "GNU AFFERO GENERAL PUBLIC LICENSE" "$I/licenses/LICENSE"
       - name: Ensure GLib schemas and icon themes are bundled
         run: |
           APPDIR=dist/cartiglio/_internal
@@ -204,6 +206,7 @@ jobs:
           ls $I/pymupdf/*mupdf*.so*
           test -d $I/fontTools
           test -f $I/share/locale/it/LC_MESSAGES/cartiglio.mo
+          grep -q "GNU AFFERO GENERAL PUBLIC LICENSE" $I/licenses/LICENSE
       - name: Slim the bundle (locales and icon variants the app never loads)
         run: |
           I=dist/cartiglio/_internal

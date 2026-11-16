@@ -69,6 +69,13 @@
   </requires>
 
   <releases>
+    <release version="1.1.7" date="2026-11-16">
+      <description>
+        <p>Windows: the check for a newer version, when it is on, is made when the window is first shown and when it is restored from the taskbar, at most every 4 hours (before, once a day at start).</p>
+        <p>The errors of the window are kept in errors.log too, in the app's state folder; the preferences are written whole or not at all, and the save is tried again for a moment when Windows refuses it.</p>
+        <p>The licence: Cartiglio stays under the GNU AGPL, version 3 or later, with modules shared with the author's other apps under the GNU GPL, version 3 or later; the README and the About window say so, and the text of the licence comes with the program.</p>
+      </description>
+    </release>
     <release version="1.1.6" date="2026-11-10">
       <description>
         <p>Windows: the window resizes, maximizes and drags as Windows itself does it again. The workarounds of the last versions got in the way of that and are replaced by lighter ones: opening the menu no longer shrinks a maximized window, and a menu left open when the window is minimized is closed when the window comes back.</p>

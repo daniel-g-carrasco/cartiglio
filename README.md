@@ -12,7 +12,7 @@
   <a href="https://github.com/daniel-g-carrasco/cartiglio/actions/workflows/build.yml">
     <img src="https://github.com/daniel-g-carrasco/cartiglio/actions/workflows/build.yml/badge.svg" alt="Build">
   </a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License: AGPL-3.0"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg" alt="License: AGPL-3.0-or-later"></a>
 </p>
 
 A delivery of drawings and reports is ready, exported to PDF, and then the
@@ -153,8 +153,17 @@ only place `gi` is imported). `gui` uses `app`, `app` uses `core` and `data`,
 `core` and `data` know nobody. `tests/test_strati.py` reads the imports and
 fails with file, line and rule.
 
+Some modules are not Cartiglio's own: the ones every app of mine has (languages,
+folders, the error log, updates and their signature, writing a file whole,
+Windows' title bars), copied byte for byte from the model they come from and
+listed with their fingerprints in `impronte/comune.json`; `tests/test_impronte.py`
+fails when one of them is changed here. The errors of the window are kept in
+`errors.log`, in `%LOCALAPPDATA%\cartiglio\state` on Windows and
+`~/.local/state/cartiglio` on Linux.
+
 ```bash
-python tests/test_cartiglio.py     # core, CLI, translations (needs PyMuPDF)
+python tools/run_tests.py tests    # every test, with a limit per test (needs PyMuPDF)
+python tests/test_cartiglio.py     # core, CLI, translations, on its own
 python tests/test_strati.py        # the layers: every import goes one way
 python tools/compile_po.py         # po/*.po -> locale/ (no gettext tools needed)
 python tools/make_icon.py          # raster icons and installer bitmaps (needs Pillow)
@@ -163,4 +172,12 @@ pyinstaller --noconfirm cartiglio.spec
 
 ## License
 
-[GNU AGPL-3.0](LICENSE) — the PDF engine, MuPDF/PyMuPDF, is AGPL as well.
+[GNU AGPL-3.0-or-later](LICENSE): the GNU Affero General Public License, version 3
+or (at your option) any later version. The PDF engine, MuPDF/PyMuPDF, is AGPL as
+well.
+
+The modules shared with my other apps (those of `impronte/comune.json`, each with
+the line `SPDX-License-Identifier: GPL-3.0-or-later`) are under the GNU General
+Public License, version 3 or later. Section 13 of the GPL and section 13 of the
+AGPL let the two be combined in one program: those files keep their GPL, and
+Cartiglio as a whole is distributed under the AGPL-3.0-or-later.
