@@ -553,6 +553,24 @@ class Everything(unittest.TestCase):
     def test_all(self):
         self.assertEqual(main(), 0)
 
+    def test_copy_preserves_an_existing_partial_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            original = drawing()
+            source = folder / "drawing.pdf"
+            source.write_bytes(original)
+            target = folder / "output" / "drawing.pdf"
+            target.parent.mkdir()
+            partial = target.with_suffix(".pdf.part")
+            partial.write_bytes(b"incomplete work from another program")
+
+            redate.redate_file(analyse.analyse_file(source), target, NEW)
+
+            self.assertEqual(source.read_bytes(), original)
+            self.assertEqual(partial.read_bytes(), b"incomplete work from another program")
+            self.assertEqual({entry.name for entry in target.parent.iterdir()}, {target.name, partial.name})
+            self.assertIn("16/10/2026", page_text(target))
+
 
 if __name__ == "__main__":
     sys.exit(main())
