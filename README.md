@@ -144,6 +144,18 @@ for every `v*` tag: Windows with MSYS2 UCRT64 + PyInstaller + Inno Setup,
 Linux with PyInstaller and Flatpak (GNOME 50 runtime). The tag must match
 `__version__` in `src/cartiglio/__init__.py`.
 
+Pull requests run Ruff security rules and a redacted Gitleaks scan of the
+proposed commits. Each build records the dependency versions and SHA-256 of
+the installer, portable archives and Flatpak. Before signing, the release
+job verifies that the inventories match the packages and commit, and checks
+the eligible components in OSV. The weekly inventory job rechecks the
+published digests and advisories. Releases published before inventories were
+introduced report missing inventories. OSV coverage is limited to supported
+ecosystems. The Windows audit checks PyMuPDF and fontTools by their upstream
+PyPI versions. The MSYS2 package versions, listed Ubuntu libraries and
+Flatpak runtime remain visible for their respective advisory sources. The
+Windows build also reports files with unresolved provenance or notices.
+
 The code is the package `src/cartiglio/`, in four layers with the imports going
 one way only: `core/` (the dates, where the title block is, what was found:
 values in, values out), `data/` (the PDF's content streams as bytes), `app/`

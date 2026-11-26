@@ -6,12 +6,13 @@ copy is saved, and the pictures of the title block before and after.
 from __future__ import annotations
 
 import math
-import os
 from collections import Counter
 from datetime import date
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from cartiglio.core.model import Analysis, CartiglioError, NothingToChange, Result
+from cartiglio.data.atomic import replace_patiently
 from cartiglio.data.content_stream import explicit_line_moves, split_shown_strings
 from cartiglio.i18n import _
 
@@ -217,25 +218,24 @@ def redate_file(analysis: Analysis, dest: Path, new_date: date, selection=None,
     doc, before, hits, _texts = _rewrite(
         pymupdf, data, analysis, selection, new_date,
         progress=(lambda f: progress(0.3 + 0.5 * f)) if progress else None)
-    if progress:
-        progress(0.8)
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    tmp = dest.with_name(dest.name + ".part")
     try:
+        if progress:
+            progress(0.8)
+        dest.parent.mkdir(parents=True, exist_ok=True)
         # A full, compact save: the rewritten page is compressed and the
         # orphaned objects dropped, so the file is no larger than before.
         # (garbage=3 would also merge duplicate objects: no smaller here, and
         # half a minute on a long report.)
-        doc.save(tmp, garbage=2, deflate=True, use_objstms=1,
-                 encryption=pymupdf.PDF_ENCRYPT_KEEP)
-        os.replace(tmp, dest)
+        with TemporaryDirectory(dir=dest.parent, prefix=".cartiglio-") as folder:
+            tmp = Path(folder) / "output.pdf"
+            doc.save(tmp, garbage=2, deflate=True, use_objstms=1,
+                     encryption=pymupdf.PDF_ENCRYPT_KEEP)
+            if dest.exists() and not overwrite:
+                raise FileExistsError(str(dest))
+            replace_patiently(tmp, dest)
     finally:
         doc.close()
         before.close()
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
     if progress:
         progress(1.0)
     return Result(dest, len(hits))
