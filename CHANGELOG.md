@@ -4,6 +4,24 @@ What changes for whoever uses Cartiglio. The notes of the versions released
 up to 1.1.6 are in `data/io.github.daniel_g_carrasco.cartiglio.metainfo.xml`
 and on the GitHub releases.
 
+## [1.1.8] - 2026-11-27
+
+### Fixed
+
+- A dated copy is written in a temporary folder next to the destination and
+  then put in place: a file with the same name plus `.part`, left there by
+  another program, is no longer overwritten or deleted.
+
+### Licence
+
+- The Windows installer and portable zip carry the original licence texts of
+  the bundled GStreamer, PyGObject, GObject Introspection, CA certificates
+  and PyMuPDF libraries, taken from their signed MSYS2 sources, and every
+  file in them has a recorded origin.
+- Each release comes with an inventory of its components and their versions
+  (`.inventory.json`, signed like the other files), checked before signing
+  and again every week for published advisories.
+
 ## [1.1.7] - 2026-11-16
 
 ### Changed
