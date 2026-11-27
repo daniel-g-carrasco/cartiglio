@@ -69,6 +69,12 @@
   </requires>
 
   <releases>
+    <release version="1.1.8" date="2026-11-27">
+      <description>
+        <p>A dated copy is written in a temporary folder next to the destination and then put in place, so a file with the same name plus .part left by another program is no longer touched.</p>
+        <p>The Windows packages carry the original licence texts of the bundled libraries, and each release comes with a signed inventory of its components.</p>
+      </description>
+    </release>
     <release version="1.1.7" date="2026-11-16">
       <description>
         <p>Windows: the check for a newer version, when it is on, is made when the window is first shown and when it is restored from the taskbar, at most every 4 hours (before, once a day at start).</p>
